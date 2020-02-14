@@ -40,7 +40,7 @@ defmodule PhoenixRoutesJs.Mixfile do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:phoenix_html, "~> 2.7"},
-      {:plug, "~> 1.0"}
+      {:plug_cowboy, "~> 2.0"}
     ]
   end
 end
