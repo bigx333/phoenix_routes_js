@@ -8,28 +8,25 @@ defmodule PhoenixRoutesJs.View do
 
   alias PhoenixRoutesJs.Routes
 
-  @doc """
-  Returns script for injecting helpers to window object
-  """
+  # Returns script for injecting helpers to window object
+  @doc false
   def render_routes_script(conn) when is_map(conn) do
     render_routes_script(conn.private[:phoenix_router])
   end
 
   @doc false
   def render_routes_script(base) do
-    content_tag(:script, [type: "text/javascript"]) do
+    content_tag(:script, type: "text/javascript") do
       base
-        |> Routes.fetch
-        |> Map.to_list
-        |> script
-        |> raw
+      |> Routes.fetch()
+      |> Map.to_list()
+      |> script
+      |> raw
     end
   end
 
-
-  @doc """
-  Generate javascript script based on routes
-  """
+  # Generate javascript script based on routes
+  @doc false
   defp script(routes) do
     """
 
@@ -68,10 +65,8 @@ defmodule PhoenixRoutesJs.View do
     """
   end
 
-
-  @doc """
-  Generates routes functions based on defined actions
-  """
+  # Generates routes functions based on defined actions
+  @doc false
   defp render_routes_functions(routes) do
     render_routes_functions(routes, [])
   end
@@ -84,13 +79,13 @@ defmodule PhoenixRoutesJs.View do
   @doc false
   defp render_routes_functions([], functions), do: functions
 
-  @doc """
-  Render router function
-  """
+  # Render router function
+  @doc false
   defp render_route({function_name, actions}) do
     function = function_name <> "_path"
-    actions_list = Map.keys(actions) |> Enum.map(fn(key) -> '"#{key}"' end) |> Enum.join(", ")
+    actions_list = Map.keys(actions) |> Enum.map(fn key -> '"#{key}"' end) |> Enum.join(", ")
     actions = Map.to_list(actions)
+
     """
 
         #{function}: function(action) {
@@ -112,9 +107,8 @@ defmodule PhoenixRoutesJs.View do
     """
   end
 
-  @doc """
-  Render actions functions for route helper
-  """
+  # Render actions functions for route helper
+  @doc false
   defp render_actions_functions(actions) do
     render_actions_functions(actions, [])
   end
@@ -130,6 +124,7 @@ defmodule PhoenixRoutesJs.View do
   @doc false
   defp render_action({action, pattern}) do
     [args, path, length] = arguments(pattern)
+
     """
 
           self['#{action}'] = function(args, options) {
@@ -144,84 +139,80 @@ defmodule PhoenixRoutesJs.View do
     """
   end
 
-  @doc """
-  Render variables assigment to arguments
-  """
+  # Render variables assigment to arguments
+  @doc false
   defp arguments(pattern) do
     paths = String.split(pattern, "/")
 
-    args = paths
+    args =
+      paths
       |> Enum.filter(&argument_filter/1)
       |> Enum.map(&argument_normalizer/1)
 
-    args_string = args
+    args_string =
+      args
       |> render_arguments_string
 
-    path_string = paths
+    path_string =
+      paths
       |> Enum.map(&path_normalizer/1)
       |> render_path_string
 
     [args_string, path_string, length(args)]
   end
 
-  @doc """
-  Filter arguments
-  """
+  # Filter arguments
+  @doc false
   defp argument_filter(path), do: String.starts_with?(path, ":")
 
-  @doc """
-  Removes prefix from arguments
-  """
+  # Removes prefix from arguments
+  @doc false
   defp argument_normalizer(path), do: String.replace_prefix(path, ":", "")
 
-  @doc """
-  Renders arguments
-  """
+  # Renders arguments
+  @doc false
   defp render_arguments_string(args), do: Enum.join(args, ", ")
 
-  @doc """
-  Replace prefix to variables
-  """
+  # Replace prefix to variables
+  @doc false
   defp path_normalizer(path) do
     case String.starts_with?(path, ":") do
       true ->
         "' + #{String.replace_prefix(path, ":", "")} + '"
+
       false ->
         path
     end
   end
 
-  @doc """
-  Render javascript path string
-  """
+  # Render javascript path string
+  @doc false
   defp render_path_string(paths), do: Enum.join(paths, "/")
 
-  @doc """
-  Render variables
-  """
+  # Render variables
+  @doc false
   defp render_variables(args) do
     cond do
       String.contains?(args, ",") ->
         args
-          |> String.split(",")
-          |> Enum.with_index
-          |> Enum.map(&vars_normalizer/1)
-          |> render_vars_string
+        |> String.split(",")
+        |> Enum.with_index()
+        |> Enum.map(&vars_normalizer/1)
+        |> render_vars_string
+
       args != "" ->
         "var #{args} = args[0];"
+
       args == "" ->
         nil
     end
   end
 
-  @doc """
-  Render javascript variable
-  """
+  # Render javascript variable
+  @doc false
   defp vars_normalizer({key, index}), do: "var #{key} = args[#{index}];\n"
 
-  @doc """
-  Render all variables
-  """
+  # Render all variables
+  @doc false
   defp render_vars_string(vars), do: Enum.join(vars, "")
 end
-

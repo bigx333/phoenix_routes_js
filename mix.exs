@@ -2,14 +2,16 @@ defmodule PhoenixRoutesJs.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :phoenix_routes_js,
-     version: "0.1.1",
-     elixir: "~> 1.4",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps(),
-     description: description(),
-     package: package()]
+    [
+      app: :phoenix_routes_js,
+      version: "0.1.1",
+      elixir: "~> 1.4",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      description: description(),
+      package: package()
+    ]
   end
 
   def application do

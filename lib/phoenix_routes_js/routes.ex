@@ -11,11 +11,12 @@ defmodule PhoenixRoutesJs.Routes do
 
   @doc false
   defp group_by_path([route | routes], paths) do
-    %{helper: helper, opts: action, path: path} = route
+    %{helper: helper, plug_opts: action, path: path} = route
 
     case helper do
       nil ->
         group_by_path(routes, paths)
+
       _ ->
         path = %{helper => %{action => path}}
         updated_paths = Utils.deep_merge(paths, path)
